@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Piece Boutique</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080705;color:#f4d17a;font-family:Georgia,serif}
+header{text-align:center;padding:22px 8px;border-bottom:1px solid #b58a37}
+.logo{font-size:34px;font-weight:bold;text-shadow:0 0 12px #a87920}
+header small{color:#c5a45d;letter-spacing:3px}
+nav{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;padding:14px 5px}
+nav button{background:#100d08;color:#f2ce70;border:1px solid #b58a37;border-radius:25px;padding:10px;font-size:13px}
+nav button.active{background:#eac15e;color:#100b03}
+.page{display:none;padding:12px}
+.page.show{display:block}
+.hero{
+ min-height:310px;display:flex;flex-direction:column;
+ justify-content:flex-end;align-items:center;text-align:center;
+ padding:30px 12px;
+ background:linear-gradient(0deg,#080604 0%,#08060433 70%),
+ radial-gradient(circle at 80% 35%,#a36a21 0%,#38220e 25%,#100b07 65%);
+ border-bottom:2px solid #b58a37;
+}
+.hero h1{font-size:30px;color:#f7d77d;text-shadow:2px 3px #000}
+.hero p{font-size:17px;color:#ffe5a0}
+h2{text-align:center;color:#f4d17a}
+.products{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.product{border:2px solid #b58a37;border-radius:20px;background:linear-gradient(145deg,#1b1710,#050505);overflow:hidden;padding-bottom:12px}
+.product .photo{height:145px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#42321d,#090806);font-size:65px;color:#b89a5d}
+.product h3{font-size:19px;color:#fff0ce;margin:12px 10px 5px}
+.product p{margin:8px 10px;color:#c9bda4}
+.price{font-size:23px;font-weight:bold;color:#edc45c;margin:10px}
+.add,.action{border:0;border-radius:25px;background:#edc45c;color:#100b03;padding:12px 16px;font-weight:bold}
+.add{display:block;margin:10px auto}
+.cartline{padding:12px 4px;border-bottom:1px solid #80632b;display:flex;justify-content:space-between}
+footer{text-align:center;padding:25px;color:#9c8b69}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">☠ ONE PIECE ☠</div>
+ <small>LA BOUTIQUE DES PIRATES</small>
+</header>
+
+<nav>
+ <button class="active" onclick="page('home',this)">⌂ Accueil</button>
+ <button onclick="page('shop',this)">♙ Boutique</button>
+ <button onclick="page('cart',this)">🛒 Panier (<span id="count">0</span>)</button>
+ <button onclick="page('orders',this)">▤ Commandes</button>
+ <button onclick="page('contact',this)">✉ Contact</button>
+</nav>
+
+<section id="home" class="page show">
+ <div class="hero">
+  <h1>Bienvenue chez One Piece</h1>
+  <p>Livraison gratuite partout dans Lyon</p>
+ </div>
+ <h2>Nos produits</h2>
+ <div class="products" id="homeProducts"></div>
+</section>
+
+<section id="shop" class="page">
+ <h2>Notre boutique</h2>
+ <div class="products" id="shopProducts"></div>
+</section>
+
+<section id="cart" class="page">
+ <h2>Mon panier</h2>
+ <div id="cartItems">Ton panier est vide.</div>
+ <h2 id="total">Total : 0,00 €</h2>
+ <button class="action" onclick="order()">Envoyer ma commande</button>
+</section>
+
+<section id="orders" class="page">
+ <h2>Mes commandes</h2>
+ <p>Pour suivre ta commande, contacte notre boutique.</p>
+</section>
+
+<section id="contact" class="page">
+ <h2>Nous contacter</h2>
+ <p>Une question ? Écris-nous sur Telegram.</p>
+ <p>Le lien de contact sera ajouté après la création de ton bot.</p>
+</section>
+
+<footer>One Piece Boutique • Lyon</footer>
+
+<script>
+const products=[
+ {id:1,name:"Produit 1",price:20},
+ {id:2,name:"Produit 2",price:35},
+ {id:3,name:"Produit 3",price:25}
+];
+let cart=[];
+
+function productHTML(p){
+ return `<article class="product">
+ <div class="photo">☠</div>
+ <h3>${p.name}</h3>
+ <p>1 unité</p>
+ <div class="price">${p.price.toFixed(2)} €</div>
+ <button class="add" onclick="add(${p.id})">🛒 Ajouter</button>
+ </article>`;
+}
+function drawProducts(){
+ homeProducts.innerHTML=products.slice(0,2).map(productHTML).join("");
+ shopProducts.innerHTML=products.map(productHTML).join("");
+}
+function add(id){
+ let p=products.find(x=>x.id===id);
+ let item=cart.find(x=>x.id===id);
+ if(item)item.qty++;
+ else cart.push({...p,qty:1});
+ drawCart();
+ alert("Produit ajouté au panier !");
+}
+function drawCart(){
+ count.textContent=cart.reduce((s,p)=>s+p.qty,0);
+ let total=cart.reduce((s,p)=>s+p.price*p.qty,0);
+ document.getElementById("total").textContent="Total : "+total.toFixed(2)+" €";
+ cartItems.innerHTML=cart.length?cart.map(p=>
+ `<div class="cartline"><span>${p.name} × ${p.qty}</span><b>${(p.price*p.qty).toFixed(2)} €</b></div>`
+ ).join(""):"Ton panier est vide.";
+}
+function page(id,btn){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("show"));
+ document.getElementById(id).classList.add("show");
+ document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+ btn.classList.add("active");
+}
+function order(){
+ if(!cart.length){alert("Ton panier est vide.");return;}
+ alert("Ton panier est prêt ! La réception des commandes Telegram sera configurée à l'étape suivante.");
+}
+drawProducts();
+drawCart();
+</script>
+</body>
+</html>
